@@ -2,7 +2,6 @@
 strvcf_annotator
 ================
 
-|build-status| |docs|
 
 STR (Short Tandem Repeat) annotation tool for VCF files.
 
@@ -21,12 +20,14 @@ Installation
 ------------
 
 .. code-block:: shell
+
     # Install from source
     git clone https://github.com/KondratievaOlesya/strvcf_annotator.git
     cd strvcf_annotator
     pip install -e .
 
 .. code-block:: shell
+
     # Dev dependencies
     pip install -r requirements_dev.txt
 
@@ -38,6 +39,7 @@ Command Line
 ~~~~~~~~~~~~
 
 .. code-block:: shell
+
     # Annotate a single VCF
     strvcf-annotator --input input.vcf --str-bed repeats.bed --output output.vcf
 
@@ -76,6 +78,7 @@ BED file with STR regions
 ~~~~~~~~~~~~
 
 .. code-block:: shell
+
     CHROM   START   END     PERIOD  RU
     chr1    100     115     3       CAG
     chr1    200     212     4       ATCG
@@ -117,6 +120,7 @@ Example
 ~~~~~~~~~~~~
 
 .. code-block:: shell
+
     ##INFO=<ID=RU,Number=1,Type=String,Description="Repeat unit">
     ##INFO=<ID=PERIOD,Number=1,Type=Integer,Description="Repeat period">
     ##INFO=<ID=REF,Number=1,Type=Integer,Description="Reference copy number">
@@ -154,6 +158,7 @@ Creating a custom parser
 ~~~~~~~~~~~~
 
 .. code-block:: python
+
     from strvcf_annotator.parsers.base import BaseVCFParser
 
     class CustomParser(BaseVCFParser):
@@ -189,6 +194,7 @@ Issue: ModuleNotFoundError
 ~~~~~~~~~~~~
 
 .. code-block:: shell
+
     # Install the package in editable (dev) mode
     pip install -e .
 
@@ -199,6 +205,7 @@ This tool **only accepts normalized VCFs**. Please normalize with `bcftools` bef
 Example (produces a normalized, indexed VCF):
 
 .. code-block:: shell
+
    # Replace reference.fa with the exact reference used for the VCF
    bcftools norm -f reference.fa -m input.vcf
 
@@ -209,6 +216,7 @@ Issue: Unsorted VCF
 The tool automatically sorts the VCF in memory, but for large files pre-sorting is recommended:
 
 .. code-block:: shell
+
     bcftools sort input.vcf -o sorted.vcf
 
 
@@ -223,8 +231,7 @@ If you see warnings about a reference mismatch, check:
 Documentation
 -------------
 
-* `API Documentation <docs/API.md>`_
-* `Migration Guide <docs/MIGRATION.md>`_
+* `API Documentation <docs/API.md>`__init__
 * `Examples <examples/>`_
 
 Contributing
