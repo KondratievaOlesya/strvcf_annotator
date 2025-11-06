@@ -20,13 +20,13 @@ Features
 Installation
 ------------
 
-.. code-block:: bash
+.. code-block:: shell
     # Install from source
     git clone https://github.com/KondratievaOlesya/strvcf_annotator.git
     cd strvcf_annotator
     pip install -e .
 
-.. code-block:: bash
+.. code-block:: shell
     # Dev dependencies
     pip install -r requirements_dev.txt
 
@@ -37,7 +37,7 @@ Quick Start
 Command Line
 ~~~~~~~~~~~~
 
-.. code-block:: bash
+.. code-block:: shell
     # Annotate a single VCF
     strvcf-annotator --input input.vcf --str-bed repeats.bed --output output.vcf
 
@@ -75,7 +75,7 @@ Input format
 BED file with STR regions
 ~~~~~~~~~~~~
 
-.. code-block:: bash
+.. code-block:: shell
     CHROM   START   END     PERIOD  RU
     chr1    100     115     3       CAG
     chr1    200     212     4       ATCG
@@ -116,7 +116,7 @@ FORMAT fields
 Example
 ~~~~~~~~~~~~
 
-.. code-block:: bash
+.. code-block:: shell
     ##INFO=<ID=RU,Number=1,Type=String,Description="Repeat unit">
     ##INFO=<ID=PERIOD,Number=1,Type=Integer,Description="Repeat period">
     ##INFO=<ID=REF,Number=1,Type=Integer,Description="Reference copy number">
@@ -153,7 +153,7 @@ Extending functionality
 Creating a custom parser
 ~~~~~~~~~~~~
 
-.. code-block::python
+.. code-block:: python
     from strvcf_annotator.parsers.base import BaseVCFParser
 
     class CustomParser(BaseVCFParser):
@@ -188,7 +188,7 @@ Troubleshooting
 Issue: ModuleNotFoundError
 ~~~~~~~~~~~~
 
-.. code-block::bash
+.. code-block:: shell
     # Install the package in editable (dev) mode
     pip install -e .
 
@@ -198,7 +198,7 @@ Issue: Unnormalized VCF
 This tool **only accepts normalized VCFs**. Please normalize with `bcftools` before running.
 Example (produces a normalized, indexed VCF):
 
-.. code-block:: bash
+.. code-block:: shell
    # Replace reference.fa with the exact reference used for the VCF
    bcftools norm -f reference.fa -m input.vcf
 
@@ -208,7 +208,7 @@ Issue: Unsorted VCF
 
 The tool automatically sorts the VCF in memory, but for large files pre-sorting is recommended:
 
-.. code-block::bash
+.. code-block:: shell
     bcftools sort input.vcf -o sorted.vcf
 
 
