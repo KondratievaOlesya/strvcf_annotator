@@ -1,6 +1,10 @@
 import hashlib
 import os
 import pytest
+from strvcf_annotator import STRAnnotator
+
+# Get base directory for test data
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def file_hash(path):
     """Calculate MD5 hash of a file."""
@@ -13,20 +17,20 @@ def file_hash(path):
 @pytest.fixture(
     params=[
         (
-            "MUTO-INTL.DO253554.SA615942.wgs.20240808.gatk-mutect2.somatic.indel.vcf.gz",  
-            "269f36179979776f46c2d23b77be512b"
+            "test.vcf.gz",
+            "fa758538aaea3a54de9dc302dd18e0d2"
         ),
         (
-            "MUTO-INTL.DO253205.SA615836.wgs.20240922.sanger-wgs.somatic.indel.annotated.vcf",  
-            "abcdef1234567890abcdef1234567890"
+            "pindel_header.vcf",
+            "9bd195a201d6b3317645ce5d44d40a2e"
         ),
         (
-            "APGI-AU.DO32825.SA407790.wgs.20210623.gatk-mutect2.somatic.indel.vcf.gz",  
-            "fedcba0987654321fedcba0987654321"
+            "mutec2_indel.vcf.gz",
+            "d03362c108c136ba45eb0d7de259a251"
         ),
         (
-            "TCGA-DC-6682.vcf",  
-            "11112222333344445555666677778888"
+            "TCGA-DC-6682.vcf",
+            "ea8daee9916c761edc9be74bc3eea475"
         )
     ]
 )
@@ -41,14 +45,14 @@ class TestProcessVcf:
         input_vcf, expected_hash, request = vcf_case
         update_hashes = request.config.getoption("--update-vcf-hashes")
 
-      
         str_bed = os.path.abspath(os.path.join(base_dir, "data", "GRCh38_repeats.bed"))
         output_filename = os.path.basename(input_vcf).replace(".vcf.gz", "").replace(".vcf", "") + ".processed.vcf"
         output_path = os.path.abspath(os.path.join(base_dir, "output", output_filename))
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
-        str_df = strvcf_annotator.load_str_reference(str_bed)
-        strvcf_annotator.process_vcf(input_vcf, str_df, output_path)
+        # Use new API
+        annotator = STRAnnotator(str_bed)
+        annotator.annotate_vcf_file(input_vcf, output_path)
 
         actual_hash = file_hash(output_path)
 

@@ -1,0 +1,9 @@
+src/strvcf_annotator/__pycache__
+src/strvcf_annotator/core/__pycache__
+src/strvcf_annotator/parsers/__pycache__
+src/strvcf_annotator/utils/__pycache__
+tests/__pycache__
+tests/cli/__pycache__
+tests/integration/__pycache__
+tests/output
+tests/unit/__pycache__
