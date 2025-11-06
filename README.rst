@@ -231,7 +231,7 @@ If you see warnings about a reference mismatch, check:
 Documentation
 -------------
 
-* `API Documentation <docs/API.md>`
+* `API Documentation <docs/API.md>`_
 * `Examples <examples/>`_
 
 Contributing
