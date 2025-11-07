@@ -18,7 +18,8 @@ Features
 
 Installation
 ------------
-Package is available through `PyPI <https://pypi.org/project/strvcf-annotator/>`. To install, type:
+Package is available through `PyPI <https://pypi.org/project/strvcf-annotator/>`_. To install, type:
+
 .. code-block:: shell
 
     pip install strvcf-annotator
