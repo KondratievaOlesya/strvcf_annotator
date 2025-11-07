@@ -32,10 +32,9 @@ tests/test_parsers.py
 tests/test_performance.py
 tests/test_repeat_utils.py
 tests/test_str_reference.py
-tests/test_strvcf_annotator.py
 tests/test_validation.py
-tests/data/mutec2_indel.vcf.gz
 tests/data/GRCh38_repeats.bed
+tests/data/TCGA-DC-6682.vcf
+tests/data/mutec2_indel.vcf.gz
 tests/data/pindel_header.vcf
 tests/data/test.vcf.gz
-tests/data/TCGA-DC-6682.vcf

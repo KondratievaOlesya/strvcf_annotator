@@ -18,11 +18,15 @@ Features
 
 Installation
 ------------
+Package is available through `PyPI <https://pypi.org/project/strvcf-annotator/>`. To install, type:
+.. code-block:: shell
 
+    pip install strvcf-annotator
+    
 .. code-block:: shell
 
     # Install from source
-    git clone https://github.com/KondratievaOlesya/strvcf_annotator.git
+    git clone https://github.com/acg-team/strvcf_annotator.git
     cd strvcf_annotator
     pip install -e .
 
@@ -75,7 +79,7 @@ Input format
 -------------
 
 BED file with STR regions
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: shell
 
@@ -112,7 +116,7 @@ INFO fields
 - **PERFECT**: TRUE if both alleles are perfect repeats
 
 FORMAT fields
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 - **REPCN**: Genotype expressed as repeat copy numbers
 
@@ -152,10 +156,10 @@ Architecture
         └── validation.py    # Input validation
 
 Extending functionality
------------
+-----------------------
 
 Creating a custom parser
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -188,10 +192,10 @@ Performance
 - **Batch processing**: Supports processing multiple files
 
 Troubleshooting
------------
+---------------
 
 Issue: ModuleNotFoundError
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: shell
 
@@ -211,7 +215,7 @@ Example (produces a normalized, indexed VCF):
 
 
 Issue: Unsorted VCF
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 The tool automatically sorts the VCF in memory, but for large files pre-sorting is recommended:
 
@@ -221,7 +225,7 @@ The tool automatically sorts the VCF in memory, but for large files pre-sorting 
 
 
 Issue: Reference mismatch
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you see warnings about a reference mismatch, check:
 
@@ -231,7 +235,7 @@ If you see warnings about a reference mismatch, check:
 Documentation
 -------------
 
-* `API Documentation <docs/API.md>`
+* `API Documentation <docs/API.md>`_
 * `Examples <examples/>`_
 
 Contributing

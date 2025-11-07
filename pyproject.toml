@@ -47,10 +47,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/KondratievaOlesya/strvcf_annotator"
-Repository = "https://github.com/KondratievaOlesya/strvcf_annotator"
-Documentation = "https://github.com/KondratievaOlesya/strvcf_annotator/#readme"
-"Bug Tracker" = "https://github.com/KondratievaOlesya/strvcf_annotator/issues"
+Homepage = "https://github.com/acg-team/strvcf_annotator"
+Repository = "https://github.com/acg-team/strvcf_annotator"
+Documentation = "https://github.com/acg-team/strvcf_annotator/#readme"
+"Bug Tracker" = "https://github.com/acg-team/strvcf_annotator/issues"
 
 [project.scripts]
 strvcf-annotator = "strvcf_annotator.cli:main"
