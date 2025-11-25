@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add performance optimizations for large VCF files
 - Integrate with cloud storage (S3, GCS)
 
+## [0.2.0] - 2025-11-25
+- Fix error in unsorted VCF detection
+- Annotation was done until chromosome 9. Fixed
+
 ## [0.1.0] - 2025-11-04
 
 ### Added
