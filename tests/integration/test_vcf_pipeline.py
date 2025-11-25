@@ -18,7 +18,7 @@ def file_hash(path):
     params=[
         (
             "test.vcf.gz",
-            "fa758538aaea3a54de9dc302dd18e0d2"
+            "0cb0cac184724cf9ea3ea27c037704cc"
         ),
         (
             "pindel_header.vcf",
@@ -26,11 +26,11 @@ def file_hash(path):
         ),
         (
             "mutec2_indel.vcf.gz",
-            "d03362c108c136ba45eb0d7de259a251"
+            "9ce2671c373aead335e0f2eba02bf537"
         ),
         (
             "TCGA-DC-6682.vcf",
-            "ea8daee9916c761edc9be74bc3eea475"
+            "0321d7668390582f4a3ee0f538c60b0c"
         )
     ]
 )

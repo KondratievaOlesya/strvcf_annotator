@@ -1,29 +1,31 @@
 """VCF file processing and workflow management."""
 
-import pysam
-import pandas as pd
 import logging
-from typing import Iterator, List
 from pathlib import Path
+from typing import Iterator, List
 
-from .annotation import make_modified_header, build_new_record, should_skip_genotype
+import pandas as pd
+import pysam
+
 from ..parsers.base import BaseVCFParser
 from ..parsers.generic import GenericParser
+from ..utils.vcf_utils import chrom_to_order
+from .annotation import build_new_record, make_modified_header, should_skip_genotype
 
 logger = logging.getLogger(__name__)
 
 
 def check_vcf_sorted(vcf_in: pysam.VariantFile) -> bool:
     """Validate VCF sorting by chromosome and position.
-    
+
     Checks if VCF records are sorted by chromosome and position.
     Rewinds the file after checking.
-    
+
     Parameters
     ----------
     vcf_in : pysam.VariantFile
         Input VCF file
-        
+
     Returns
     -------
     bool
@@ -31,51 +33,52 @@ def check_vcf_sorted(vcf_in: pysam.VariantFile) -> bool:
     """
     last_chrom = None
     last_pos = -1
-    
+
     for rec in vcf_in:
-        chrom = rec.contig
+        chrom = chrom_to_order(rec.contig)
         pos = rec.pos
-        
-        if last_chrom is not None:
+
+        if last_chrom is not None:  # noqa: SIM102
             if chrom < last_chrom or (chrom == last_chrom and pos < last_pos):
+                logger.warning(f"Not sorted, because {chrom} < {last_chrom} or {pos} < {last_pos}")
                 vcf_in.reset()
                 return False
-        
+
         last_chrom, last_pos = chrom, pos
-    
+
     vcf_in.reset()
     return True
 
 
 def reset_and_sort_vcf(vcf_in: pysam.VariantFile) -> List[pysam.VariantRecord]:
     """Sort VCF records in memory when needed.
-    
+
     Loads all VCF records into memory and sorts them by chromosome
     and position according to the contig order in the header.
-    
+
     Parameters
     ----------
     vcf_in : pysam.VariantFile
         Input VCF file
-        
+
     Returns
     -------
     List[pysam.VariantRecord]
         Sorted list of VCF records
-        
+
     Notes
     -----
     This loads the entire VCF into memory, so use with caution for large files.
     """
     header = vcf_in.header
     records = list(vcf_in)
-    
+
     # Create contig order mapping
     contig_order = {c: i for i, c in enumerate(header.contigs.keys())}
-    
+
     # Sort by contig order and position
     records.sort(key=lambda r: (contig_order.get(r.contig, float("inf")), r.pos))
-    
+
     return records
 
 
@@ -116,9 +119,9 @@ def generate_annotated_records(
     """
     if parser is None:
         parser = GenericParser()
-    
+
     header = make_modified_header(vcf_in)
-    
+
     # Check if VCF is sorted
     if not check_vcf_sorted(vcf_in):
         logger.warning("Input VCF is not sorted - sorting in memory.")
@@ -126,10 +129,10 @@ def generate_annotated_records(
     else:
         vcf_in.reset()
         records = vcf_in.fetch()
-    
+
     # Prepare STR list for efficient lookup
     str_idx = 0
-    str_list = str_df.sort_values(by=["CHROM", "START"]).to_dict("records")
+    str_list = str_df.to_dict("records")
 
     skipped_count = 0
     for record in records:
@@ -241,16 +244,16 @@ def process_directory(
         Enable somatic filtering. Default is False.
     """
     from .str_reference import load_str_reference
-    
+
     if parser is None:
         parser = GenericParser()
-    
+
     # Create output directory
     Path(output_dir).mkdir(parents=True, exist_ok=True)
-    
+
     # Load STR reference
     str_df = load_str_reference(str_bed_path)
-    
+
     # Process each VCF file
     input_path = Path(input_dir)
     for vcf_file in input_path.glob('*.vcf*'):
@@ -260,12 +263,12 @@ def process_directory(
             if base_name.endswith('.vcf'):
                 base_name = base_name[:-4]
             output_file = Path(output_dir) / f"{base_name}.annotated.vcf"
-            
+
             # Skip if already processed
             if output_file.exists():
                 logger.info(f"Skipping {vcf_file.name} — already processed.")
                 continue
-            
+
             logger.info(f"Processing {vcf_file.name}...")
             annotate_vcf_to_file(
                 str(vcf_file),
