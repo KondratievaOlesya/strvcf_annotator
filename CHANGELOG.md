@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add performance optimizations for large VCF files
 - Integrate with cloud storage (S3, GCS)
 
+## [0.2.1] - 2025-11-26
+- Reformatted code for consistency and style.
+- Added tox-based test matrix and GitHub Actions CI.
+- Updated repeat unit counting logic to use the maximum length of uninterrupted motif runs, and added tests for complex cases.
+
+
 ## [0.2.0] - 2025-11-25
 - Fixed error in detection of unsorted VCF files
 - Fixed bug that caused annotation to stop at chromosome 9; annotation now runs through all chromosomes
