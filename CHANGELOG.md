@@ -14,8 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Integrate with cloud storage (S3, GCS)
 
 ## [0.2.0] - 2025-11-25
-- Fix error in unsorted VCF detection
-- Annotation was done until chromosome 9. Fixed
+- Fixed error in detection of unsorted VCF files
+- Fixed bug that caused annotation to stop at chromosome 9; annotation now runs through all chromosomes
 
 ## [0.1.0] - 2025-11-04
 

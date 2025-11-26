@@ -41,6 +41,7 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
     ],
     description="STR annotation tool for VCF files",
     entry_points={
@@ -49,7 +50,7 @@ setup(
         ],
     },
     install_requires=requirements,
-    license="MIT license",
+    license="MIT",
     long_description=readme,
     include_package_data=True,
     keywords='strvcf_annotator',
