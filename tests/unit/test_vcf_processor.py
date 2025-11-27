@@ -1,14 +1,16 @@
 """Unit tests for VCF processor functions."""
 
-import pytest
-import pysam
-import pandas as pd
-import tempfile
 import os
+import tempfile
+
+import pandas as pd
+import pysam
+import pytest
+
 from strvcf_annotator.core.vcf_processor import (
     check_vcf_sorted,
+    generate_annotated_records,
     reset_and_sort_vcf,
-    generate_annotated_records
 )
 from strvcf_annotator.parsers.generic import GenericParser
 
@@ -17,18 +19,18 @@ from strvcf_annotator.parsers.generic import GenericParser
 def basic_vcf_header():
     """Create a basic VCF header for testing."""
     header = pysam.VariantHeader()
-    header.add_line('##fileformat=VCFv4.2')
-    header.contigs.add('chr1', length=1000000)
-    header.contigs.add('chr2', length=1000000)
-    header.contigs.add('chr3', length=1000000)
-    header.add_sample('TUMOR')
-    header.add_sample('NORMAL')
+    header.add_line("##fileformat=VCFv4.2")
+    header.contigs.add("chr1", length=1000000)
+    header.contigs.add("chr2", length=1000000)
+    header.contigs.add("chr3", length=1000000)
+    header.add_sample("TUMOR")
+    header.add_sample("NORMAL")
 
     # Add basic INFO and FORMAT fields
-    header.info.add('DP', 1, 'Integer', 'Total read depth')
-    header.formats.add('GT', 1, 'String', 'Genotype')
-    header.formats.add('AD', 'R', 'Integer', 'Allelic depths')
-    header.formats.add('DP', 1, 'Integer', 'Read depth')
+    header.info.add("DP", 1, "Integer", "Total read depth")
+    header.formats.add("GT", 1, "String", "Genotype")
+    header.formats.add("AD", "R", "Integer", "Allelic depths")
+    header.formats.add("DP", 1, "Integer", "Read depth")
 
     return header
 
@@ -36,35 +38,35 @@ def basic_vcf_header():
 @pytest.fixture
 def sorted_vcf_file(basic_vcf_header):
     """Create a temporary sorted VCF file using pysam API."""
-    temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.vcf', delete=False)
+    temp_file = tempfile.NamedTemporaryFile(mode="w", suffix=".vcf", delete=False)
     temp_file.close()  # Close immediately so pysam can write to it
 
     try:
         # Write VCF using pysam API
-        with pysam.VariantFile(temp_file.name, 'w', header=basic_vcf_header) as vcf_out:
+        with pysam.VariantFile(temp_file.name, "w", header=basic_vcf_header) as vcf_out:
             # Write sorted records
             records_data = [
-                ('chr1', 100, 'A', 'T'),
-                ('chr1', 200, 'G', 'C'),
-                ('chr1', 300, 'T', 'A'),
-                ('chr2', 100, 'A', 'G'),
-                ('chr2', 200, 'C', 'T'),
+                ("chr1", 100, "A", "T"),
+                ("chr1", 200, "G", "C"),
+                ("chr1", 300, "T", "A"),
+                ("chr2", 100, "A", "G"),
+                ("chr2", 200, "C", "T"),
             ]
             for chrom, pos, ref, alt in records_data:
                 rec = vcf_out.new_record(
                     contig=chrom,
-                    start=pos-1,  # 0-based
+                    start=pos - 1,  # 0-based
                     alleles=(ref, alt),
                     qual=30,
-                    filter=['PASS'],
-                    info={'DP': 50}
+                    filter=["PASS"],
+                    info={"DP": 50},
                 )
-                rec.samples['TUMOR']['GT'] = (0, 1)
-                rec.samples['TUMOR']['AD'] = (20, 30)
-                rec.samples['TUMOR']['DP'] = 50
-                rec.samples['NORMAL']['GT'] = (0, 0)
-                rec.samples['NORMAL']['AD'] = (50, 0)
-                rec.samples['NORMAL']['DP'] = 50
+                rec.samples["TUMOR"]["GT"] = (0, 1)
+                rec.samples["TUMOR"]["AD"] = (20, 30)
+                rec.samples["TUMOR"]["DP"] = 50
+                rec.samples["NORMAL"]["GT"] = (0, 0)
+                rec.samples["NORMAL"]["AD"] = (50, 0)
+                rec.samples["NORMAL"]["DP"] = 50
                 vcf_out.write(rec)
 
         yield temp_file.name
@@ -75,35 +77,35 @@ def sorted_vcf_file(basic_vcf_header):
 @pytest.fixture
 def unsorted_vcf_file(basic_vcf_header):
     """Create a temporary unsorted VCF file using pysam API."""
-    temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.vcf', delete=False)
+    temp_file = tempfile.NamedTemporaryFile(mode="w", suffix=".vcf", delete=False)
     temp_file.close()  # Close immediately so pysam can write to it
 
     try:
         # Write VCF using pysam API
-        with pysam.VariantFile(temp_file.name, 'w', header=basic_vcf_header) as vcf_out:
+        with pysam.VariantFile(temp_file.name, "w", header=basic_vcf_header) as vcf_out:
             # Write unsorted records (positions out of order)
             records_data = [
-                ('chr1', 300, 'T', 'A'),
-                ('chr1', 100, 'A', 'T'),
-                ('chr2', 200, 'C', 'T'),
-                ('chr1', 200, 'G', 'C'),
-                ('chr2', 100, 'A', 'G'),
+                ("chr1", 300, "T", "A"),
+                ("chr1", 100, "A", "T"),
+                ("chr2", 200, "C", "T"),
+                ("chr1", 200, "G", "C"),
+                ("chr2", 100, "A", "G"),
             ]
             for chrom, pos, ref, alt in records_data:
                 rec = vcf_out.new_record(
                     contig=chrom,
-                    start=pos-1,  # 0-based
+                    start=pos - 1,  # 0-based
                     alleles=(ref, alt),
                     qual=30,
-                    filter=['PASS'],
-                    info={'DP': 50}
+                    filter=["PASS"],
+                    info={"DP": 50},
                 )
-                rec.samples['TUMOR']['GT'] = (0, 1)
-                rec.samples['TUMOR']['AD'] = (20, 30)
-                rec.samples['TUMOR']['DP'] = 50
-                rec.samples['NORMAL']['GT'] = (0, 0)
-                rec.samples['NORMAL']['AD'] = (50, 0)
-                rec.samples['NORMAL']['DP'] = 50
+                rec.samples["TUMOR"]["GT"] = (0, 1)
+                rec.samples["TUMOR"]["AD"] = (20, 30)
+                rec.samples["TUMOR"]["DP"] = 50
+                rec.samples["NORMAL"]["GT"] = (0, 0)
+                rec.samples["NORMAL"]["AD"] = (50, 0)
+                rec.samples["NORMAL"]["DP"] = 50
                 vcf_out.write(rec)
 
         yield temp_file.name
@@ -114,14 +116,16 @@ def unsorted_vcf_file(basic_vcf_header):
 @pytest.fixture
 def str_dataframe():
     """Create a sample STR DataFrame for testing."""
-    return pd.DataFrame({
-        'CHROM': ['chr1', 'chr1', 'chr2'],
-        'START': [95, 195, 95],
-        'END': [115, 215, 115],
-        'PERIOD': [2, 3, 2],
-        'RU': ['AT', 'CAG', 'GC'],
-        'COUNT': [10, 7, 10]
-    })
+    return pd.DataFrame(
+        {
+            "CHROM": ["chr1", "chr1", "chr2"],
+            "START": [95, 195, 95],
+            "END": [115, 215, 115],
+            "PERIOD": [2, 3, 2],
+            "RU": ["AT", "CAG", "GC"],
+            "COUNT": [10, 7, 10],
+        }
+    )
 
 
 class TestCheckVCFSorted:
@@ -159,12 +163,12 @@ class TestCheckVCFSorted:
 
     def test_empty_vcf_returns_true(self, basic_vcf_header):
         """Test that empty VCF is considered sorted."""
-        temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.vcf', delete=False)
+        temp_file = tempfile.NamedTemporaryFile(mode="w", suffix=".vcf", delete=False)
         temp_file.close()
 
         try:
             # Create empty VCF using pysam API
-            with pysam.VariantFile(temp_file.name, 'w', header=basic_vcf_header) as vcf_out:
+            with pysam.VariantFile(temp_file.name, "w", header=basic_vcf_header) as vcf_out:
                 pass  # Write header only, no records
 
             vcf_in = pysam.VariantFile(temp_file.name)
@@ -177,26 +181,26 @@ class TestCheckVCFSorted:
 
     def test_single_record_returns_true(self, basic_vcf_header):
         """Test that single record VCF is considered sorted."""
-        temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.vcf', delete=False)
+        temp_file = tempfile.NamedTemporaryFile(mode="w", suffix=".vcf", delete=False)
         temp_file.close()
 
         try:
             # Create VCF with single record using pysam API
-            with pysam.VariantFile(temp_file.name, 'w', header=basic_vcf_header) as vcf_out:
+            with pysam.VariantFile(temp_file.name, "w", header=basic_vcf_header) as vcf_out:
                 rec = vcf_out.new_record(
-                    contig='chr1',
+                    contig="chr1",
                     start=99,  # 0-based
-                    alleles=('A', 'T'),
+                    alleles=("A", "T"),
                     qual=30,
-                    filter=['PASS'],
-                    info={'DP': 50}
+                    filter=["PASS"],
+                    info={"DP": 50},
                 )
-                rec.samples['TUMOR']['GT'] = (0, 1)
-                rec.samples['TUMOR']['AD'] = (20, 30)
-                rec.samples['TUMOR']['DP'] = 50
-                rec.samples['NORMAL']['GT'] = (0, 0)
-                rec.samples['NORMAL']['AD'] = (50, 0)
-                rec.samples['NORMAL']['DP'] = 50
+                rec.samples["TUMOR"]["GT"] = (0, 1)
+                rec.samples["TUMOR"]["AD"] = (20, 30)
+                rec.samples["TUMOR"]["DP"] = 50
+                rec.samples["NORMAL"]["GT"] = (0, 0)
+                rec.samples["NORMAL"]["AD"] = (50, 0)
+                rec.samples["NORMAL"]["DP"] = 50
                 vcf_out.write(rec)
 
             vcf_in = pysam.VariantFile(temp_file.name)
@@ -221,15 +225,15 @@ class TestResetAndSortVCF:
         assert len(sorted_records) == 5
 
         # Check sorted order
-        assert sorted_records[0].contig == 'chr1'
+        assert sorted_records[0].contig == "chr1"
         assert sorted_records[0].pos == 100
-        assert sorted_records[1].contig == 'chr1'
+        assert sorted_records[1].contig == "chr1"
         assert sorted_records[1].pos == 200
-        assert sorted_records[2].contig == 'chr1'
+        assert sorted_records[2].contig == "chr1"
         assert sorted_records[2].pos == 300
-        assert sorted_records[3].contig == 'chr2'
+        assert sorted_records[3].contig == "chr2"
         assert sorted_records[3].pos == 100
-        assert sorted_records[4].contig == 'chr2'
+        assert sorted_records[4].contig == "chr2"
         assert sorted_records[4].pos == 200
 
     def test_preserves_sorted_order(self, sorted_vcf_file):
@@ -242,7 +246,7 @@ class TestResetAndSortVCF:
         assert sorted_records[0].pos == 100
         assert sorted_records[1].pos == 200
         assert sorted_records[2].pos == 300
-        assert sorted_records[3].contig == 'chr2'
+        assert sorted_records[3].contig == "chr2"
         assert sorted_records[3].pos == 100
 
     def test_returns_list(self, sorted_vcf_file):
@@ -255,12 +259,12 @@ class TestResetAndSortVCF:
 
     def test_empty_vcf_returns_empty_list(self, basic_vcf_header):
         """Test that empty VCF returns empty list."""
-        temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.vcf', delete=False)
+        temp_file = tempfile.NamedTemporaryFile(mode="w", suffix=".vcf", delete=False)
         temp_file.close()
 
         try:
             # Create empty VCF using pysam API
-            with pysam.VariantFile(temp_file.name, 'w', header=basic_vcf_header) as vcf_out:
+            with pysam.VariantFile(temp_file.name, "w", header=basic_vcf_header) as vcf_out:
                 pass  # No records
 
             vcf_in = pysam.VariantFile(temp_file.name)
@@ -273,27 +277,27 @@ class TestResetAndSortVCF:
 
     def test_sorts_by_contig_order(self, basic_vcf_header):
         """Test that sorting respects contig order in header."""
-        temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.vcf', delete=False)
+        temp_file = tempfile.NamedTemporaryFile(mode="w", suffix=".vcf", delete=False)
         temp_file.close()
 
         try:
             # Create VCF with records from different chromosomes using pysam API
-            with pysam.VariantFile(temp_file.name, 'w', header=basic_vcf_header) as vcf_out:
-                for chrom in ['chr3', 'chr1', 'chr2']:
+            with pysam.VariantFile(temp_file.name, "w", header=basic_vcf_header) as vcf_out:
+                for chrom in ["chr3", "chr1", "chr2"]:
                     rec = vcf_out.new_record(
                         contig=chrom,
                         start=99,  # 0-based
-                        alleles=('A', 'T'),
+                        alleles=("A", "T"),
                         qual=30,
-                        filter=['PASS'],
-                        info={'DP': 50}
+                        filter=["PASS"],
+                        info={"DP": 50},
                     )
-                    rec.samples['TUMOR']['GT'] = (0, 1)
-                    rec.samples['TUMOR']['AD'] = (20, 30)
-                    rec.samples['TUMOR']['DP'] = 50
-                    rec.samples['NORMAL']['GT'] = (0, 0)
-                    rec.samples['NORMAL']['AD'] = (50, 0)
-                    rec.samples['NORMAL']['DP'] = 50
+                    rec.samples["TUMOR"]["GT"] = (0, 1)
+                    rec.samples["TUMOR"]["AD"] = (20, 30)
+                    rec.samples["TUMOR"]["DP"] = 50
+                    rec.samples["NORMAL"]["GT"] = (0, 0)
+                    rec.samples["NORMAL"]["AD"] = (50, 0)
+                    rec.samples["NORMAL"]["DP"] = 50
                     vcf_out.write(rec)
 
             vcf_in = pysam.VariantFile(temp_file.name)
@@ -301,9 +305,9 @@ class TestResetAndSortVCF:
             vcf_in.close()
 
             # Should be sorted by header contig order: chr1, chr2, chr3
-            assert sorted_records[0].contig == 'chr1'
-            assert sorted_records[1].contig == 'chr2'
-            assert sorted_records[2].contig == 'chr3'
+            assert sorted_records[0].contig == "chr1"
+            assert sorted_records[1].contig == "chr2"
+            assert sorted_records[2].contig == "chr3"
         finally:
             os.unlink(temp_file.name)
 
@@ -319,8 +323,8 @@ class TestGenerateAnnotatedRecords:
         result = generate_annotated_records(vcf_in, str_dataframe, parser)
 
         # Should be an iterator
-        assert hasattr(result, '__iter__')
-        assert hasattr(result, '__next__')
+        assert hasattr(result, "__iter__")
+        assert hasattr(result, "__next__")
 
         vcf_in.close()
 
@@ -342,14 +346,16 @@ class TestGenerateAnnotatedRecords:
         parser = GenericParser()
 
         # Create STR dataframe with no overlap
-        str_df = pd.DataFrame({
-            'CHROM': ['chr10'],
-            'START': [1000],
-            'END': [1100],
-            'PERIOD': [2],
-            'RU': ['AT'],
-            'COUNT': [50]
-        })
+        str_df = pd.DataFrame(
+            {
+                "CHROM": ["chr10"],
+                "START": [1000],
+                "END": [1100],
+                "PERIOD": [2],
+                "RU": ["AT"],
+                "COUNT": [50],
+            }
+        )
 
         records = list(generate_annotated_records(vcf_in, str_df, parser))
 
@@ -385,12 +391,12 @@ class TestGenerateAnnotatedRecords:
 
     def test_empty_vcf_returns_no_records(self, basic_vcf_header, str_dataframe):
         """Test that empty VCF yields no records."""
-        temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.vcf', delete=False)
+        temp_file = tempfile.NamedTemporaryFile(mode="w", suffix=".vcf", delete=False)
         temp_file.close()
 
         try:
             # Create empty VCF using pysam API
-            with pysam.VariantFile(temp_file.name, 'w', header=basic_vcf_header) as vcf_out:
+            with pysam.VariantFile(temp_file.name, "w", header=basic_vcf_header) as vcf_out:
                 pass  # No records
 
             vcf_in = pysam.VariantFile(temp_file.name)
@@ -410,7 +416,7 @@ class TestGenerateAnnotatedRecords:
         parser = GenericParser()
 
         # Empty STR dataframe
-        empty_str_df = pd.DataFrame(columns=['CHROM', 'START', 'END', 'PERIOD', 'RU', 'COUNT'])
+        empty_str_df = pd.DataFrame(columns=["CHROM", "START", "END", "PERIOD", "RU", "COUNT"])
 
         records = list(generate_annotated_records(vcf_in, empty_str_df, parser))
 

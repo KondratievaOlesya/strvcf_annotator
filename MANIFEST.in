@@ -12,7 +12,7 @@ include pyproject.toml
 include setup.py
 
 # Include test data
-recursive-include tests/data *.vcf *.vcf.gz *.bed *.bed.gz *.txt
+recursive-include tests/data *.vcf *.vcf.gz *.bed
 
 # Exclude unwanted files
 global-exclude __pycache__

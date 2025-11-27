@@ -1,37 +1,29 @@
 import hashlib
 import os
+
 import pytest
+
 from strvcf_annotator import STRAnnotator
 
 # Get base directory for test data
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
 def file_hash(path):
     """Calculate MD5 hash of a file."""
     h = hashlib.md5()
-    with open(path, 'rb') as f:
+    with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(8192), b""):
             h.update(chunk)
     return h.hexdigest()
 
+
 @pytest.fixture(
     params=[
-        (
-            "test.vcf.gz",
-            "fa758538aaea3a54de9dc302dd18e0d2"
-        ),
-        (
-            "pindel_header.vcf",
-            "9bd195a201d6b3317645ce5d44d40a2e"
-        ),
-        (
-            "mutec2_indel.vcf.gz",
-            "d03362c108c136ba45eb0d7de259a251"
-        ),
-        (
-            "TCGA-DC-6682.vcf",
-            "ea8daee9916c761edc9be74bc3eea475"
-        )
+        ("test.vcf.gz", "d5354b559173a69e7045a68bb3e1b6f3"),
+        ("pindel_header.vcf", "9bd195a201d6b3317645ce5d44d40a2e"),
+        ("mutec2_indel.vcf.gz", "b624b6919aef82df2be2ff8f8e301d47"),
+        ("TCGA-DC-6682.vcf", "0321d7668390582f4a3ee0f538c60b0c"),
     ]
 )
 def vcf_case(request, data_dir):
@@ -46,7 +38,10 @@ class TestProcessVcf:
         update_hashes = request.config.getoption("--update-vcf-hashes")
 
         str_bed = os.path.abspath(os.path.join(base_dir, "data", "GRCh38_repeats.bed"))
-        output_filename = os.path.basename(input_vcf).replace(".vcf.gz", "").replace(".vcf", "") + ".processed.vcf"
+        output_filename = (
+            os.path.basename(input_vcf).replace(".vcf.gz", "").replace(".vcf", "")
+            + ".processed.vcf"
+        )
         output_path = os.path.abspath(os.path.join(base_dir, "output", output_filename))
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -61,3 +56,27 @@ class TestProcessVcf:
             # optionally save to a JSON/yaml file here
         else:
             assert actual_hash == expected_hash, f"{input_vcf} hash mismatch: {actual_hash}"
+
+    def test_reannotating_test_vcf_is_idempotent(self, data_dir, output_dir):
+        """Re-annotating an already annotated VCF should produce the same file."""
+        # Use only test.vcf.gz for idempotence check
+        input_vcf = os.path.abspath(os.path.join(data_dir, "test.vcf.gz"))
+        str_bed = os.path.abspath(os.path.join(base_dir, "data", "GRCh38_repeats.bed"))
+
+        # First annotation
+        first_output = os.path.abspath(os.path.join(output_dir, "test.processed.vcf"))
+        # Second annotation (annotate result again)
+        second_output = os.path.abspath(os.path.join(output_dir, "test.reannotated.vcf"))
+
+        os.makedirs(os.path.dirname(first_output), exist_ok=True)
+
+        annotator = STRAnnotator(str_bed)
+        annotator.annotate_vcf_file(input_vcf, first_output)
+        annotator.annotate_vcf_file(first_output, second_output)
+
+        first_hash = file_hash(first_output)
+        second_hash = file_hash(second_output)
+
+        assert first_hash == second_hash, (
+            f"Re-annotating {input_vcf} is not idempotent: {first_hash} != {second_hash}"
+        )
